@@ -45,7 +45,8 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
         if (this.bind_player !== null)
             this.lookAt(this.bind_player.position);
 
-        console.log("CAMERA POS:", this.position);
+        //console.log("TARGET POS:", this.bind_player.position);
+        //console.log("CAMERA POS:", this.position);
 
         // Update the projection matrix
         this.updateProjectionMatrix();

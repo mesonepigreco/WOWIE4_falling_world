@@ -3,6 +3,7 @@ import { pingpong } from "three/src/math/MathUtils.js";
 import * as PF from "./sprite.js";
 import * as PL from "./player.js";
 import { PlayerCamera } from "./camera.js";
+import { Level } from "./level.js";
 const scene = new THREE.Scene();
 const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -20,6 +21,10 @@ window.addEventListener("resize", (event) => {
 
 document.body.appendChild(renderer.domElement);
 
+const level = new Level(renderer, 10, 4);
+level.mainLoop(0);
+
+/*
 // Create an example scene
 const light = new THREE.AmbientLight(0xffffff);
 const p1 = new PF.Sprite(0, 0, 0, 10, 0.2, 10);
@@ -53,7 +58,7 @@ function animate(timeStamp) {
     requestAnimationFrame(animate);
 }
 animate(0);
-
+*/
 
 
 
