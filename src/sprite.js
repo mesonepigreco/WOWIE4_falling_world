@@ -7,11 +7,12 @@ export const DESTROYING = 3;
 export const PERMANENT = 4;
 
 export class Sprite {
-    constructor(x, y, z, width = 1, height = 1, depth = 1, color = 0xcccccc) {
+    constructor(x, y, z, width = 1, height = 1, depth = 1, color = 0xcccccc, scene = undefined) {
         // Construct the platform
         // x, y and z are integer
         this.position = new THREE.Vector3(x, y, z);
         this.dimension = new THREE.Vector3(width, height, depth);
+        this.scene = scene;
 
         this.status = ACTIVE;
 
@@ -24,10 +25,13 @@ export class Sprite {
         this.mesh.position.z = this.position.z;
 
         this.dynamic = false;
+        this.ignore_collision = false;
+        this.ignore_status = false;
 
         this.grounded = false;
         this.velocity = new THREE.Vector3(0,0,0);
         this.acceleration = new THREE.Vector3(0,-9.81, 0);
+        this.groups = [];
 
         this.friction = 23;
         this.ground_friction = 6;
@@ -89,7 +93,7 @@ export class Sprite {
     }
 
     update(dt, collision_group) {
-        if (!this.dynamic) this.update_status();
+        if (!this.dynamic && !this.ignore_status) this.update_status();
 
         // Implement physics
         if (this.dynamic) {
@@ -117,13 +121,15 @@ export class Sprite {
             this.position.x += dt * this.velocity.x;
 
             // Check collision and eventually reset
-            for (let i = 0; i < collision_group.length; ++i) {
-                let box = collision_group.at(i);
-                if (box.status !== ACTIVE && box.status !== DESTROYING && box.status !== PERMANENT) continue;
-                if (this.collide_box(box)) {
-                    this.position.x = old_x;
-                    this.velocity.x = 0;
-                    break;
+            if (!this.ignore_collision) {
+                for (let i = 0; i < collision_group.length; ++i) {
+                    let box = collision_group.at(i);
+                    if (box.status !== ACTIVE && box.status !== DESTROYING && box.status !== PERMANENT) continue;
+                    if (this.collide_box(box)) {
+                        this.position.x = old_x;
+                        this.velocity.x = 0;
+                        break;
+                    }
                 }
             }
 
@@ -132,42 +138,46 @@ export class Sprite {
             this.position.y += dt * this.velocity.y;
 
             // Check collision and eventually reset
+            if (!this.ignore_collision) {
             let y_collision = false;
-            if (this.velocity.y > 0) this.grounded = false;
-            for (let i = 0; i < collision_group.length; ++i) {
-                let box = collision_group.at(i);
-                if (box.status !== ACTIVE && box.status !== DESTROYING && box.status !== PERMANENT) {
-                    continue;
-                }
-                if (this.collide_box(box)) {
-                    if (this.velocity.y < 0)  {
-                        y_collision = true;
-                        if (!this.grounded) {
-                            this.grounded = true;
-                            this.sound_hit_ground.play();
-                        }
+                if (this.velocity.y > 0) this.grounded = false;
+                for (let i = 0; i < collision_group.length; ++i) {
+                    let box = collision_group.at(i);
+                    if (box.status !== ACTIVE && box.status !== DESTROYING && box.status !== PERMANENT) {
+                        continue;
                     }
+                    if (this.collide_box(box)) {
+                        if (this.velocity.y < 0)  {
+                            y_collision = true;
+                            if (!this.grounded) {
+                                this.grounded = true;
+                                this.sound_hit_ground.play();
+                            }
+                        }
 
-                    this.position.y = old_y;
-                    this.velocity.y = 0;
-                    break;
+                        this.position.y = old_y;
+                        this.velocity.y = 0;
+                        break;
+                    }
                 }
+                if (!y_collision) this.grounded = false;
             }
-            if (!y_collision) this.grounded = false;
-            
+                
 
             // Update on z
             let old_z = this.position.z;
             this.position.z += dt * this.velocity.z;
 
             // Check collision and eventually reset
-            for (let i = 0; i < collision_group.length; ++i) {
-                let box = collision_group.at(i);
-                if (box.status !== ACTIVE && box.status !== DESTROYING && box.status !== PERMANENT) continue;
-                if (this.collide_box(box)) {
-                    this.position.z = old_z;
-                    this.velocity.z = 0;
-                    break;
+            if (!this.ignore_collision) {
+                for (let i = 0; i < collision_group.length; ++i) {
+                    let box = collision_group.at(i);
+                    if (box.status !== ACTIVE && box.status !== DESTROYING && box.status !== PERMANENT) continue;
+                    if (this.collide_box(box)) {
+                        this.position.z = old_z;
+                        this.velocity.z = 0;
+                        break;
+                    }
                 }
             }
         }
@@ -177,6 +187,16 @@ export class Sprite {
         this.mesh.position.y = this.position.y;
         this.mesh.position.z = this.position.z;
 
+    }
+
+    kill() {
+        for (let i = 0; i < this.groups.length; ++i) this.groups[i].remove(this);
+
+        // Remove the scene from the mesh
+        if (this.scene !== undefined) 
+            this.scene.remove(this.mesh);
+        else   
+            console.log("Error, I cannot remove the object because the scene is undefined");
     }
 
 }
@@ -199,6 +219,17 @@ export class Group {
 
     push(element) {
         this.elements.push(element);
+        element.groups.push(this);
+    }
+
+    remove(element) {
+        // Remove the sprite from the group
+        var index = this.elements.findIndex( (x) => x == element);
+        this.elements.splice(index, 1);
+        
+        // Remove the group from the sprite groups
+        var index = element.groups.findIndex( (x) => x == this);
+        element.groups.splice(index, 1);
     }
 
     get length() {

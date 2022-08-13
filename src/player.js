@@ -18,7 +18,7 @@ export class Player extends Sprite {
         const audioLoader = new THREE.AudioLoader();
         const listener = new THREE.AudioListener();
         this.sound_jump = new THREE.Audio(listener);
-
+        this.sound_coin = new THREE.Audio(listener);
 
         audioLoader.load("assets/audio/jump.wav", function(buffer) {
             this.sound_jump.setBuffer(buffer);
@@ -26,6 +26,11 @@ export class Player extends Sprite {
             //this.sound_jump.setVolume(1);
         }.bind(this));
 
+        audioLoader.load("assets/audio/coin.wav", function(buffer) {
+            this.sound_coin.setBuffer(buffer);
+            this.sound_coin.setVolume(0.7);
+            this.sound_coin.setLoop(false);
+        }.bind(this));
 
         function jump() {
             if (this.grounded) {

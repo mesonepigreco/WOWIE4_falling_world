@@ -9,6 +9,7 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
         this.velocity = new THREE.Vector3(0,0,0);
         this.speed = 2;
         this.distance = 5;
+        this.ahead = 1;
         this.heigth = 5;
         this.fixed_height = true;
     }
@@ -28,6 +29,13 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
         return res;
     }
 
+    get lookPos() {
+        const position = new THREE.Vector3();
+        position.copy(this.bind_player.position);
+        position.y += this.ahead;
+        return position;
+    }
+
     update_velocity() {
         const target = this.target;
         this.velocity.x = this.target.x - this.position.x;
@@ -43,7 +51,7 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
         this.position.z += this.velocity.z * this.speed * dt;
         
         if (this.bind_player !== null)
-            this.lookAt(this.bind_player.position);
+            this.lookAt(this.lookPos);
 
         //console.log("TARGET POS:", this.bind_player.position);
         //console.log("CAMERA POS:", this.position);
