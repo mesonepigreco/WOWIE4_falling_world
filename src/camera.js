@@ -9,7 +9,7 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
         this.velocity = new THREE.Vector3(0,0,0);
         this.speed = 2;
         this.distance = 5;
-        this.heigth = 6;
+        this.heigth = 5;
         this.fixed_height = true;
     }
 

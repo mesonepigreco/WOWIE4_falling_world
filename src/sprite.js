@@ -4,6 +4,7 @@ export const INVISIBLE = 0;
 export const ACTIVE = 1;
 export const APPEARING = 2;
 export const DESTROYING = 3;
+export const PERMANENT = 4;
 
 export class Sprite {
     constructor(x, y, z, width = 1, height = 1, depth = 1, color = 0xcccccc) {
@@ -30,6 +31,14 @@ export class Sprite {
 
         this.friction = 23;
         this.ground_friction = 6;
+
+        const listener = new THREE.AudioListener();
+        const audioLoader = new THREE.AudioLoader();
+        this.sound_hit_ground = new THREE.Audio(listener);
+        audioLoader.load("assets/audio/hit_ground.wav", function(buffer) {
+            this.sound_hit_ground.setBuffer(buffer);
+            this.sound_hit_ground.setVolume(0.5);
+        }.bind(this));
     }
 
     add_scene(scene) {
@@ -65,7 +74,7 @@ export class Sprite {
     update_status() {
         //console.log("my status:", this.status);
         //this.mesh.material.opacity = 0.7;
-        if (this.status === ACTIVE) {
+        if (this.status === ACTIVE || this.status == PERMANENT) {
             this.mesh.material.opacity = 1.0;
             this.mesh.material.color = new THREE.Color(0xdddddd);
         } else if (this.status === INVISIBLE) {
@@ -110,7 +119,7 @@ export class Sprite {
             // Check collision and eventually reset
             for (let i = 0; i < collision_group.length; ++i) {
                 let box = collision_group.at(i);
-                if (box.status !== ACTIVE && box.status !== DESTROYING) continue;
+                if (box.status !== ACTIVE && box.status !== DESTROYING && box.status !== PERMANENT) continue;
                 if (this.collide_box(box)) {
                     this.position.x = old_x;
                     this.velocity.x = 0;
@@ -123,22 +132,28 @@ export class Sprite {
             this.position.y += dt * this.velocity.y;
 
             // Check collision and eventually reset
+            let y_collision = false;
             if (this.velocity.y > 0) this.grounded = false;
             for (let i = 0; i < collision_group.length; ++i) {
                 let box = collision_group.at(i);
-                if (box.status !== ACTIVE && box.status !== DESTROYING) {
-                    console.log("Ignoring collision!");
+                if (box.status !== ACTIVE && box.status !== DESTROYING && box.status !== PERMANENT) {
                     continue;
                 }
                 if (this.collide_box(box)) {
-                    if (this.velocity.y < 0) this.grounded = true;
+                    if (this.velocity.y < 0)  {
+                        y_collision = true;
+                        if (!this.grounded) {
+                            this.grounded = true;
+                            this.sound_hit_ground.play();
+                        }
+                    }
 
                     this.position.y = old_y;
                     this.velocity.y = 0;
                     break;
                 }
-                this.grounded = false;
             }
+            if (!y_collision) this.grounded = false;
             
 
             // Update on z
@@ -148,7 +163,7 @@ export class Sprite {
             // Check collision and eventually reset
             for (let i = 0; i < collision_group.length; ++i) {
                 let box = collision_group.at(i);
-                if (box.status !== ACTIVE && box.status !== DESTROYING) continue;
+                if (box.status !== ACTIVE && box.status !== DESTROYING && box.status !== PERMANENT) continue;
                 if (this.collide_box(box)) {
                     this.position.z = old_z;
                     this.velocity.z = 0;

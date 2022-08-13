@@ -15,11 +15,24 @@ export class Player extends Sprite {
         this.speed = 76.2;
         this.jump_value = 12;
 
+        const audioLoader = new THREE.AudioLoader();
+        const listener = new THREE.AudioListener();
+        this.sound_jump = new THREE.Audio(listener);
+
+
+        audioLoader.load("assets/audio/jump.wav", function(buffer) {
+            this.sound_jump.setBuffer(buffer);
+            console.log("JUMP LOADED:");
+            //this.sound_jump.setVolume(1);
+        }.bind(this));
+
 
         function jump() {
-            console.log("JUMPING:", this.grounded);
-            if (this.grounded)
+            if (this.grounded) {
                 this.velocity.y += this.jump_value;
+                this.sound_jump.play();
+                console.log("JUMPING:", this.grounded);
+            }
         }
 
         this.key_control.firefunctions_down.push({
