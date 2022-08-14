@@ -4,7 +4,7 @@ import * as THREE from "three";
 
 export class Player extends Sprite {
     constructor(x, y, z) {
-        super(x, y, z, 1, 1, 1, 0xff0000);
+        super(x, y, z, 1, 1, 1, 0x00FF00);
         this.dynamic = true;
 
         this.key_control = new Keyboard();

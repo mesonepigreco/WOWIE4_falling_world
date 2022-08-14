@@ -8,8 +8,8 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
         this.bind_player = null;
         this.velocity = new THREE.Vector3(0,0,0);
         this.speed = 2;
-        this.distance = 5;
-        this.ahead = 1;
+        this.distance = 8;
+        this.ahead = 2;
         this.heigth = 5;
         this.fixed_height = true;
     }
@@ -32,7 +32,7 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
     get lookPos() {
         const position = new THREE.Vector3();
         position.copy(this.bind_player.position);
-        position.y += this.ahead;
+        position.y = Math.max(position.y, this.ahead);
         return position;
     }
 

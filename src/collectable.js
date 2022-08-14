@@ -20,6 +20,7 @@ export class Collectable extends Sprite{
         this.player_bind = player_bind;
         this.height = y;
         this.level_bind = level_bind;
+        this.index = 0;
 
         this.mesh = new THREE.Mesh(geometry, material);
         this.floating_period = 1500; // in ms
@@ -29,6 +30,14 @@ export class Collectable extends Sprite{
         this.ignore_collision = true;
         this.ignore_status = true;
         this.speed = 1;
+
+
+        this.light = new THREE.PointLight(0xff0000, 1.5, 20, 2);
+    }
+
+    add_scene(scene) {
+        super.add_scene(scene);
+        scene.add(this.light);
     }
 
 
@@ -43,6 +52,10 @@ export class Collectable extends Sprite{
             this.position.y + radius, this.position.z + radius);
     }
 
+    kill() {
+        super.kill();
+        this.scene.remove(this.light);
+    }
 
     update(dt, collision_group) {
         //super.update(dt, collision_group);        
@@ -53,10 +66,22 @@ export class Collectable extends Sprite{
             if (this.player_bind.collide_box(this)) {
                 // Collision with the player
                 this.player_bind.sound_coin.play();
-                console.log("OPEN THE MENU");
-                this.level_bind.display_menu = new Menu(this.level_bind.upgrades);
+                //console.log("OPEN THE MENU");
+                //this.level_bind.display_menu = new Menu(this.level_bind.upgrades);
                 this.kill();
+
+                // Switch off the light and on
+                for (let i = 0; i < this.level_bind.suns.length; ++i) {
+                    let light = this.level_bind.suns[i];
+                    if (i !== this.index + 1) {
+                        light.intensity = 0;
+                    } else {
+                        light.intensity = this.level_bind.sun_intensity;
+                    }
+                }
             }
         }
+
+        this.light.position.copy(this.position);
     }
 }

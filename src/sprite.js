@@ -87,8 +87,8 @@ export class Sprite {
             this.mesh.material.opacity = 0.3;
             this.mesh.material.color = new THREE.Color(0x22FF22);
         }else if (this.status === DESTROYING) {
-            this.mesh.material.opacity = 1;
-            this.mesh.material.color = new THREE.Color(0xFF0A0A0A);
+            this.mesh.material.opacity = 0.7;
+            this.mesh.material.color = new THREE.Color(0xFF0A0A);
         }
     }
 

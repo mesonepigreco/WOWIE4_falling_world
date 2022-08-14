@@ -5,7 +5,7 @@ import * as PL from "./player.js";
 import { PlayerCamera } from "./camera.js";
 import { Level } from "./level.js";
 const scene = new THREE.Scene();
-const renderer = new THREE.WebGLRenderer();
+const renderer = new THREE.WebGLRenderer({antialias: true});
 renderer.setSize(window.innerWidth, window.innerHeight);
 const camera = new PlayerCamera(75, window.innerWidth / window.innerHeight,
     0.5, 1000);

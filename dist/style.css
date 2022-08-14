@@ -1,0 +1,39 @@
+@font-face {
+    font-family: "press-start";
+    src: url("prstartk.ttf");
+}
+
+body {
+    margin: 0px;
+    overflow: hidden;
+}
+.menu {
+    position : absolute;
+    margin : 0 0 0 0;
+    width : 100%;
+    height : 100%;
+    top : 0px;
+    left : 0px;
+    align-items: center;
+    background-color: rgba(0,0,0,0.2);
+}
+
+ul {
+    display: block;
+    list-style-type: none;
+    align-items: center;
+}
+
+li {
+    color : #fff;    
+    font-family: "press-start";
+    font-size: 22px;
+    transition: 0.5s;
+    padding-top: 10px;
+    width: fit-content;
+    padding-left: 50px;
+}
+
+li:hover {
+    transform: scale(1.1);
+}

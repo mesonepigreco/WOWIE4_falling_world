@@ -39,16 +39,19 @@ export class Menu {
         function press_w() {
             this.focus -= 1;
             if (this.focus < 0) this.focus = upgrade_list.length - 1;
+            this.hover();
+            console.log("Focus on:", upgrade_list[this.focus]);
         }
         function press_s() {
             this.focus += 1;
             if (this.focus >= upgrade_list.length) this.focus = 0;
+            this.hover();
+            console.log("Focus on:", upgrade_list[this.focus]);
         }
         function press_return() {
             // Avoid pressing return too soon
             if (Date.now() - this.trigger > this.cooldown) {
                 this.final_status = this.focus;
-                this.destroy();
             }
         }
 
@@ -66,20 +69,26 @@ export class Menu {
                 func : press_return.bind(this)
             }
         ];
+
+        // Apply the hover
+        this.hover();
     }
 
     hover() {
-        const mouseOver = new Event("mouseover");
-        this.li_elements[this.focus].dispatchEvent(mouseOver);
+        for (let i = 0; i < this.li_elements.length; ++i) {
+            if (i == this.focus)
+                this.li_elements[i].style.transform = "scale(1.1)";
+            else
+                this.li_elements[i].style.transform = "scale(1.0)";
+        }
     }
 
     update() {
-        this.hover();
-
         // TODO: sometimes play the voices
     }
 
     destroy() {
+        console.log("Destroy fired.");
         document.body.removeChild(this.divContainer);
     }
 
