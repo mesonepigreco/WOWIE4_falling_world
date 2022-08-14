@@ -6,6 +6,8 @@ export class Player extends Sprite {
     constructor(x, y, z) {
         super(x, y, z, 1, 1, 1, 0x00FF00);
         this.dynamic = true;
+        this.ignore_status = true;
+        this.can_move = true;
 
         this.key_control = new Keyboard();
 
@@ -47,6 +49,9 @@ export class Player extends Sprite {
     }
 
     update_controls(dt) {
+        this.update_direction();
+        if (!this.can_move) return;
+
         if (this.key_control.keys["a"]) {
             this.mesh.rotation.y += this.rot_speed * dt;
         } 
@@ -54,7 +59,6 @@ export class Player extends Sprite {
             this.mesh.rotation.y -= this.rot_speed * dt;
         }
 
-        this.update_direction();
 
         if (this.key_control.keys["w"]) {
             this.acceleration.x += dt *this.speed * this.direction.x;

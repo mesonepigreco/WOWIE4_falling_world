@@ -70,6 +70,9 @@ export class Collectable extends Sprite{
                 //this.level_bind.display_menu = new Menu(this.level_bind.upgrades);
                 this.kill();
 
+                // Add the respawn point
+                this.level_bind.respawn_position.copy(this.position);
+
                 // Switch off the light and on
                 for (let i = 0; i < this.level_bind.suns.length; ++i) {
                     let light = this.level_bind.suns[i];

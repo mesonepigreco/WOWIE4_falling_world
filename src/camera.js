@@ -12,9 +12,12 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
         this.ahead = 2;
         this.heigth = 5;
         this.fixed_height = true;
+        this.current_target = new THREE.Vector3(1, 1, 0);
+        this.velocity_target = new THREE.Vector3(0,0,0);
     }
 
     get target() {
+
         const res = new THREE.Vector3(this.position.x, this.position.y, this.position.z);
 
         if (this.bind_player !== null) {
@@ -29,6 +32,7 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
         return res;
     }
 
+
     get lookPos() {
         const position = new THREE.Vector3();
         position.copy(this.bind_player.position);
@@ -37,11 +41,13 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
     }
 
     update_velocity() {
-        const target = this.target;
         this.velocity.x = this.target.x - this.position.x;
         this.velocity.y = this.target.y - this.position.y;
         this.velocity.z = this.target.z - this.position.z;
-
+        
+        this.velocity_target.x = +this.lookPos.x - this.current_target.x;
+        this.velocity_target.y = +this.lookPos.y - this.current_target.y;
+        this.velocity_target.z = +this.lookPos.z - this.current_target.z;
     }
 
     update(dt) {
@@ -49,9 +55,15 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
         this.position.x += this.velocity.x * this.speed * dt;
         this.position.y += this.velocity.y * this.speed * dt;
         this.position.z += this.velocity.z * this.speed * dt;
+
+        this.current_target.x += this.velocity_target.x * this.speed * dt;
+        this.current_target.y += this.velocity_target.y * this.speed * dt;
+        this.current_target.z += this.velocity_target.z * this.speed * dt;
         
-        if (this.bind_player !== null)
-            this.lookAt(this.lookPos);
+        if (this.bind_player !== null) {
+            this.lookAt(this.current_target);
+            //this.current_target.copy(this.lookPos);
+        }
 
         //console.log("TARGET POS:", this.bind_player.position);
         //console.log("CAMERA POS:", this.position);
