@@ -31,6 +31,9 @@ export class Collectable extends Sprite{
         this.ignore_status = true;
         this.speed = 1;
 
+        // The function to be fired when collected
+        this.fire_function = null;
+
 
         this.light = new THREE.PointLight(0xff0000, 1.5, 20, 2);
     }
@@ -69,6 +72,10 @@ export class Collectable extends Sprite{
                 //console.log("OPEN THE MENU");
                 //this.level_bind.display_menu = new Menu(this.level_bind.upgrades);
                 this.kill();
+
+                if (this.fire_function !== null) {
+                    this.fire_function();
+                }
 
                 // Add the respawn point
                 this.level_bind.respawn_position.copy(this.position);
